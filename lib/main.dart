@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
-import 'features/auth/login_page.dart'; // Import halaman login
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // 1. IMPORT INI
+import 'features/auth/login_page.dart';
+import 'features/auth/splash_page.dart';
 
 void main() {
-  runApp(const LesInApp());
+  // 2. BUNGKUS APLIKASI DENGAN ProviderScope
+  // Ini wajib hukumnya kalau pakai Riverpod!
+  runApp(
+    const ProviderScope(
+      child: LesInApp(),
+    ),
+  );
 }
 
 class LesInApp extends StatelessWidget {
@@ -11,14 +19,13 @@ class LesInApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // Hilangkan pita debug merah
+      debugShowCheckedModeBanner: false,
       title: 'LesIn',
       theme: ThemeData(
-        // Mengatur warna utama aplikasi jadi Biru
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const LoginPage(), // Arahkan ke halaman login
+      home: const SplashPage(),
     );
   }
 }

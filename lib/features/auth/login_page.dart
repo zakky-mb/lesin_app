@@ -1,11 +1,44 @@
 import 'package:flutter/material.dart';
-import '../home/home_page.dart'; // 1. IMPORT PENTING: Panggil halaman Home
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Wajib import ini
+import '../home/home_page.dart';
+import 'auth_controller.dart'; // Import controller yang baru dibuat
 
-class LoginPage extends StatelessWidget {
+// 1. Ganti StatelessWidget jadi ConsumerWidget
+class LoginPage extends ConsumerWidget {
   const LoginPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  // 2. Tambahkan parameter 'WidgetRef ref' (Ini remote control Riverpod)
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 3. Pantau Status Login (Loading/Error/Sukses)
+    final authState = ref.watch(authControllerProvider);
+
+    // 4. LISTEN (Dengar): Kalau ada Error atau Sukses, lakukan sesuatu
+    ref.listen<AsyncValue<void>>(authControllerProvider, (previous, next) {
+      // Jika Error, munculkan SnackBar merah
+      if (next.hasError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.error.toString()),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      // Jika Sukses, pindah ke Home
+      if (next is AsyncData && !next.isLoading && previous is! AsyncData) {
+        // Cek biar gak double nav
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      }
+    });
+
+    // Kita butuh controller text untuk mengambil input user
+    // (Cara cepat tanpa bikin stateful widget, kita taruh di build sementara ini)
+    final emailController = TextEditingController(text: "siswa@lesin.com");
+    final passwordController = TextEditingController(text: "123456");
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -15,88 +48,66 @@ class LoginPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // --- HEADER / JUDUL ---
               const Icon(Icons.school, size: 80, color: Colors.blue),
               const SizedBox(height: 16),
               const Text(
                 "Selamat Datang di LesIn 👋",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue),
               ),
-              const SizedBox(height: 8),
-              const Text(
-                "Silakan masuk untuk melanjutkan",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
-              ),
-
               const SizedBox(height: 32),
 
-              // --- INPUT EMAIL ---
-              const Text(
-                "Email Address",
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
+              // INPUT EMAIL
               TextFormField(
-                keyboardType: TextInputType.emailAddress,
+                controller: emailController, // Pasang controller
                 decoration: const InputDecoration(
-                  hintText: "Masukkan email kamu",
-                  prefixIcon: Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
+                  labelText: "Email",
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email),
                 ),
               ),
+              const SizedBox(height: 16),
 
-              const SizedBox(height: 20),
-
-              // --- INPUT PASSWORD ---
-              const Text(
-                "Password",
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
+              // INPUT PASSWORD
               TextFormField(
+                controller: passwordController, // Pasang controller
                 obscureText: true,
                 decoration: const InputDecoration(
-                  hintText: "Masukkan password",
-                  prefixIcon: Icon(Icons.lock_outline),
-                  suffixIcon: Icon(Icons.visibility_off_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
+                  labelText: "Password",
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock),
                 ),
               ),
+              const SizedBox(height: 24),
 
-              const SizedBox(height: 32),
-
-              // --- TOMBOL LOGIN ---
+              // TOMBOL LOGIN (PINTAR)
               ElevatedButton(
-                onPressed: () {
-                  // 2. LOGIKA PINDAH HALAMAN
-                  // Menggunakan pushReplacement agar user tidak bisa back ke login
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
-                  );
-                },
+                onPressed: authState.isLoading
+                    ? null // Matikan tombol kalau lagi loading
+                    : () {
+                        // Panggil fungsi login di Controller
+                        ref.read(authControllerProvider.notifier).login(
+                              emailController.text,
+                              passwordController.text,
+                            );
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
                 ),
-                child: const Text(
-                  "Masuk Sekarang",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                // Kalau loading tampilkan putaran, kalau tidak tampilkan teks
+                child: authState.isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2),
+                      )
+                    : const Text("Masuk Sekarang",
+                        style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
