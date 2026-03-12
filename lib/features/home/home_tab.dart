@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../order/select_subject_page.dart';
 
 class HomeTab extends StatelessWidget {
   const HomeTab({super.key});
@@ -161,8 +162,13 @@ class HomeTab extends StatelessWidget {
                               title: "Pesan",
                               icon: Icons.edit_document,
                               onTap: () {
-                                // TODO: MASUK KE HALAMAN PILIH MAPEL (STEP SELANJUTNYA)
-                                print("Masuk ke Pilih Mapel");
+                                // LANGSUNG MASUK KE FLOW PILIH MAPEL
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const SelectSubjectPage()),
+                                );
                               },
                             ),
                             _buildMainMenu(

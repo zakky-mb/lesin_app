@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'auth_controller.dart';
-import 'login_page.dart';
-import '../home/home_page.dart';
+import '../../core/storage/storage_service.dart';
+import 'welcome_page.dart';
+import '../home/home_page.dart'; // Murid
+import '../tutor/tutor_dashboard_page.dart'; // Guru
 
-// Pakai ConsumerStatefulWidget karena kita butuh 'initState' (Dijalankan saat halaman baru dibuka)
 class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 
@@ -16,51 +16,55 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   void initState() {
     super.initState();
-    // Langsung jalankan pengecekan saat halaman dibuka
-    _checkAuth();
+    _checkRouting();
   }
 
-  void _checkAuth() async {
-    // 1. Simulasi delay sebentar biar Logo-nya sempat kelihatan (Aesthetic ✨)
-    await Future.delayed(const Duration(seconds: 2));
+  void _checkRouting() async {
+    await Future.delayed(
+        const Duration(seconds: 2)); // Tahan 2 detik biar logo terlihat
 
-    // 2. Minta Controller cek brankas
-    // Kita pakai 'read' karena cuma butuh panggil fungsi sekali, gak butuh dipantau terus
-    final isUserLoggedIn =
-        await ref.read(authControllerProvider.notifier).checkLoginStatus();
+    final storage = ref.read(storageServiceProvider);
+    final token = await storage.getToken();
+    final role = await storage.getRole();
 
-    // 3. Tentukan Arah Navigasi
     if (mounted) {
-      // Cek apakah halaman masih ada (biar gak error)
-      if (isUserLoggedIn) {
-        // Kalau Login -> Ke Home
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
+      if (token != null && token.isNotEmpty) {
+        // SUDAH LOGIN -> Cek Role
+        if (role == 'tutor') {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const TutorDashboardPage()));
+        } else {
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
+        }
       } else {
-        // Kalau Belum -> Ke Login
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginPage()),
-        );
+        // BELUM LOGIN -> Lempar ke Halaman Welcome
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const WelcomePage()));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFFF9966), Color(0xFFFF5E62)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Logo Aplikasi
-            Icon(Icons.school, size: 100, color: Colors.blue),
+            Icon(Icons.school, size: 100, color: Colors.white),
             SizedBox(height: 24),
-            // Loading Muter
-            CircularProgressIndicator(),
+            CircularProgressIndicator(color: Colors.white),
           ],
         ),
       ),
