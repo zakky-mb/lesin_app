@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // 1. IMPORT INI
-import 'features/auth/login_page.dart';
-import 'features/auth/splash_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+// Import halaman Welcome yang baru kita buat
+import 'features/auth/welcome_page.dart';
 
 void main() {
-  // 2. BUNGKUS APLIKASI DENGAN ProviderScope
-  // Ini wajib hukumnya kalau pakai Riverpod!
   runApp(
     const ProviderScope(
       child: LesInApp(),
@@ -22,10 +20,12 @@ class LesInApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'LesIn',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        // Ubah tema jadi Pink Salmon (sesuai desain baru)
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFF5E62)),
         useMaterial3: true,
       ),
-      home: const SplashPage(),
+      // Pintu masuk diarahkan ke WelcomePage (Login/Register Flow)
+      home: const WelcomePage(),
     );
   }
 }
