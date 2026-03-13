@@ -3,38 +3,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'tutor_status_controller.dart';
 import '../auth/auth_controller.dart';
 import '../auth/welcome_page.dart';
-import 'incoming_order_page.dart'; // Import halaman order masuk
+import 'incoming_order_page.dart';
+import 'wallet_page.dart'; // <--- IMPORT WALLET PAGE
 
 class TutorDashboardPage extends ConsumerWidget {
   const TutorDashboardPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Pantau status Online/Offline
     final isOnline = ref.watch(tutorStatusProvider);
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text("Beranda Mitra Guru",
+        title: const Text("Beranda Mitra",
             style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
-        // --- BAGIAN INI YANG TADI ERROR (SUDAH DIPERBAIKI) ---
         actions: [
-          // Tombol Rahasia buat ngetes layar Order Masuk
           IconButton(
-            icon: const Icon(Icons.notifications_active, color: Colors.blue),
+            icon: const Icon(Icons.notifications_active,
+                color: Color(0xFFFF5E62)),
             onPressed: () {
               Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const IncomingOrderPage()),
-              );
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const IncomingOrderPage()));
             },
           ),
-          // Tombol Logout
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.red),
             onPressed: () {
@@ -47,22 +44,19 @@ class TutorDashboardPage extends ConsumerWidget {
             },
           )
         ],
-      ), // <--- Jangan lupa kurung tutup AppBar
-      // ---------------------------------------------------
-
+      ),
       body: Column(
         children: [
-          // --- HEADER PROFIL GURU ---
+          // --- HEADER ---
           Container(
             color: Colors.white,
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
                 const CircleAvatar(
-                  radius: 30,
-                  backgroundImage:
-                      NetworkImage("https://i.pravatar.cc/150?img=11"),
-                ),
+                    radius: 30,
+                    backgroundImage:
+                        NetworkImage("https://i.pravatar.cc/150?img=11")),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -76,38 +70,31 @@ class TutorDashboardPage extends ConsumerWidget {
                     ],
                   ),
                 ),
-                // Bintang Rating
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                       color: Colors.orange[50],
                       borderRadius: BorderRadius.circular(20)),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.orange, size: 18),
-                      SizedBox(width: 4),
-                      Text("4.8",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange)),
-                    ],
-                  ),
+                  child: const Row(children: [
+                    Icon(Icons.star, color: Colors.orange, size: 18),
+                    SizedBox(width: 4),
+                    Text("4.8",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.orange))
+                  ]),
                 ),
               ],
             ),
           ),
-
           const SizedBox(height: 16),
 
-          // --- TOMBOL TOGGLE STATUS BESAR ---
+          // --- TOGGLE STATUS ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: GestureDetector(
-              onTap: () {
-                // Ubah status saat diklik
-                ref.read(tutorStatusProvider.notifier).toggleStatus();
-              },
+              onTap: () =>
+                  ref.read(tutorStatusProvider.notifier).toggleStatus(),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 width: double.infinity,
@@ -125,68 +112,68 @@ class TutorDashboardPage extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    Icon(
-                      isOnline ? Icons.radar : Icons.power_settings_new,
-                      color: isOnline ? Colors.white : Colors.grey[600],
-                      size: 40,
-                    ),
+                    Icon(isOnline ? Icons.radar : Icons.power_settings_new,
+                        color: isOnline ? Colors.white : Colors.grey[600],
+                        size: 40),
                     const SizedBox(height: 12),
                     Text(
-                      isOnline
-                          ? "Status: AKTIF / MENUNGGU ORDER"
-                          : "Status: TIDAK AKTIF / LIBUR",
-                      style: TextStyle(
-                        color: isOnline ? Colors.white : Colors.grey[700],
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                        isOnline
+                            ? "Status: AKTIF / MENUNGGU ORDER"
+                            : "Status: TIDAK AKTIF / LIBUR",
+                        style: TextStyle(
+                            color: isOnline ? Colors.white : Colors.grey[700],
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold)),
                     if (isOnline)
                       const Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: Text("Lokasi GPS dibagikan...",
-                            style:
-                                TextStyle(color: Colors.white70, fontSize: 12)),
-                      )
+                          padding: EdgeInsets.only(top: 8.0),
+                          child: Text("Lokasi GPS dibagikan...",
+                              style: TextStyle(
+                                  color: Colors.white70, fontSize: 12)))
                   ],
                 ),
               ),
             ),
           ),
-
           const SizedBox(height: 24),
 
-          // --- SUMMARY PENDAPATAN ---
+          // --- SUMMARY KARTU (BISA DIKLIK) ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
                 Expanded(
                     child: _buildSummaryCard(
-                        "Pendapatan Hari Ini",
-                        "Rp 150.000",
+                        "Total Saldo",
+                        "Rp 1.550.000",
                         Icons.account_balance_wallet,
-                        Colors.blue)),
+                        const Color(0xFFFF5E62), // Tema pink
+                        onTap: () {
+                  // MASUK KE HALAMAN WALLET
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const WalletPage()));
+                })),
                 const SizedBox(width: 16),
                 Expanded(
-                    child: _buildSummaryCard("Selesai", "3 Order",
-                        Icons.check_circle, Colors.green)),
+                    child: _buildSummaryCard(
+                        "Selesai", "3 Order", Icons.check_circle, Colors.green,
+                        onTap: () {})),
               ],
             ),
           ),
-
           const SizedBox(height: 24),
 
-          // --- RIWAYAT MENGAJAR ---
+          // --- RIWAYAT ---
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30)),
-              ),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30))),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -223,26 +210,32 @@ class TutorDashboardPage extends ConsumerWidget {
     );
   }
 
-  // Widget Helper untuk Kartu Summary
+  // WIDGET HELPER UPDATE DENGAN ONTAP
   Widget _buildSummaryCard(
-      String title, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: color),
-          const SizedBox(height: 12),
-          Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-          const SizedBox(height: 4),
-          Text(value,
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        ],
+      String title, String value, IconData icon, Color color,
+      {required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: color),
+            const SizedBox(height: 12),
+            Text(title,
+                style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+            const SizedBox(height: 4),
+            Text(value,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ],
+        ),
       ),
     );
   }

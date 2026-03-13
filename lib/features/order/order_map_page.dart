@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'active_order_student_page.dart'; // Pastikan file ini sudah kamu buat ya!
 
 class OrderMapPage extends StatefulWidget {
   const OrderMapPage({super.key});
@@ -192,24 +193,38 @@ class _OrderMapPageState extends State<OrderMapPage>
                       ),
                     ),
                     const SizedBox(height: 20),
+
+                    // --- TOMBOL HUBUNGI GURU YANG SUDAH DIPERBAIKI ---
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
-                          // TODO: Masuk ke halaman Chat / Tracking Order
-                          Navigator.pop(context);
+                          // Pindah ke Halaman Tracking Murid (Active Order Student)
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ActiveOrderStudentPage(
+                                bookingId: "ORD-12345",
+                                tutorName: "Pak Budi",
+                              ),
+                            ),
+                          );
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF5E62),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              const Color(0xFFFF5E62)),
+                          foregroundColor:
+                              MaterialStateProperty.all(Colors.white),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
+                          ),
                         ),
                         child: const Text("Hubungi Guru",
                             style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold)),
+                                fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     )
                   ]
