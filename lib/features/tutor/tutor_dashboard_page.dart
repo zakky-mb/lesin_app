@@ -4,7 +4,7 @@ import 'tutor_status_controller.dart';
 import '../auth/auth_controller.dart';
 import '../auth/welcome_page.dart';
 import 'incoming_order_page.dart';
-import 'wallet_page.dart'; // <--- IMPORT WALLET PAGE
+import 'wallet_page.dart'; // Import halaman dompet
 
 class TutorDashboardPage extends ConsumerWidget {
   const TutorDashboardPage({super.key});
@@ -16,38 +16,34 @@ class TutorDashboardPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text("Beranda Mitra",
+        title: const Text("Beranda Mitra Guru",
             style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_active,
-                color: Color(0xFFFF5E62)),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const IncomingOrderPage()));
-            },
+            icon: const Icon(Icons.notifications_active, color: Colors.blue),
+            onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const IncomingOrderPage())),
           ),
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.red),
             onPressed: () {
               ref.read(authControllerProvider.notifier).logout();
               Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const WelcomePage()),
-                (route) => false,
-              );
+                  context,
+                  MaterialPageRoute(builder: (context) => const WelcomePage()),
+                  (route) => false);
             },
           )
         ],
       ),
       body: Column(
         children: [
-          // --- HEADER ---
+          // HEADER PROFIL
           Container(
             color: Colors.white,
             padding: const EdgeInsets.all(20),
@@ -89,7 +85,7 @@ class TutorDashboardPage extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
 
-          // --- TOGGLE STATUS ---
+          // TOGGLE STATUS
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: GestureDetector(
@@ -124,12 +120,6 @@ class TutorDashboardPage extends ConsumerWidget {
                             color: isOnline ? Colors.white : Colors.grey[700],
                             fontSize: 16,
                             fontWeight: FontWeight.bold)),
-                    if (isOnline)
-                      const Padding(
-                          padding: EdgeInsets.only(top: 8.0),
-                          child: Text("Lokasi GPS dibagikan...",
-                              style: TextStyle(
-                                  color: Colors.white70, fontSize: 12)))
                   ],
                 ),
               ),
@@ -137,35 +127,36 @@ class TutorDashboardPage extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // --- SUMMARY KARTU (BISA DIKLIK) ---
+          // --- SUMMARY PENDAPATAN (BISA DIKLIK MASUK WALLET) ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
                 Expanded(
-                    child: _buildSummaryCard(
-                        "Total Saldo",
-                        "Rp 1.550.000",
-                        Icons.account_balance_wallet,
-                        const Color(0xFFFF5E62), // Tema pink
-                        onTap: () {
-                  // MASUK KE HALAMAN WALLET
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const WalletPage()));
-                })),
+                  child: _buildSummaryCard(
+                    "Pendapatan Hari Ini",
+                    "Rp 150.000",
+                    Icons.account_balance_wallet,
+                    Colors.blue,
+                    onTap: () {
+                      // BUKA HALAMAN DOMPET
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const WalletPage()));
+                    },
+                  ),
+                ),
                 const SizedBox(width: 16),
                 Expanded(
-                    child: _buildSummaryCard(
-                        "Selesai", "3 Order", Icons.check_circle, Colors.green,
-                        onTap: () {})),
+                    child: _buildSummaryCard("Selesai", "3 Order",
+                        Icons.check_circle, Colors.green)),
               ],
             ),
           ),
           const SizedBox(height: 24),
 
-          // --- RIWAYAT ---
+          // RIWAYAT
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(20),
@@ -210,13 +201,12 @@ class TutorDashboardPage extends ConsumerWidget {
     );
   }
 
-  // WIDGET HELPER UPDATE DENGAN ONTAP
+  // WIDGET HELPER DIPERBARUI (Bisa menerima onTap)
   Widget _buildSummaryCard(
       String title, String value, IconData icon, Color color,
-      {required VoidCallback onTap}) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap, // Aksi saat diklik
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(

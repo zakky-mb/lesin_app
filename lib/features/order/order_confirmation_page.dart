@@ -22,10 +22,9 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
   late int distancePrice;
   late int totalPrice;
 
-  // Default metode pembayaran
+  // State untuk Metode Pembayaran
   String selectedPayment = "Tunai (Cash)";
   IconData paymentIcon = Icons.money;
-  Color paymentColor = Colors.green;
 
   @override
   void initState() {
@@ -34,13 +33,12 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
     totalPrice = widget.basePrice + distancePrice;
   }
 
-  // BOTTOM SHEET UNTUK PILIH METODE PEMBAYARAN
+  // Fungsi memunculkan Bottom Sheet Pembayaran
   void _showPaymentSelector() {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) {
         return Padding(
           padding: const EdgeInsets.all(24.0),
@@ -56,7 +54,6 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
               ListTile(
                 leading: const Icon(Icons.money, color: Colors.green),
                 title: const Text("Tunai (Cash)"),
-                subtitle: const Text("Bayar langsung ke guru"),
                 trailing: selectedPayment == "Tunai (Cash)"
                     ? const Icon(Icons.check_circle, color: Color(0xFFFF5E62))
                     : null,
@@ -64,31 +61,29 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
                   setState(() {
                     selectedPayment = "Tunai (Cash)";
                     paymentIcon = Icons.money;
-                    paymentColor = Colors.green;
                   });
                   Navigator.pop(context);
                 },
               ),
+              const Divider(),
 
-              // Opsi 2: Digital (LesPay)
+              // Opsi 2: Saldo LesPay
               ListTile(
                 leading: const Icon(Icons.account_balance_wallet,
                     color: Colors.blue),
                 title: const Text("LesPay (Saldo Digital)"),
                 subtitle: const Text("Saldo: Rp 150.000"),
-                trailing: selectedPayment == "LesPay (Saldo Digital)"
+                trailing: selectedPayment == "LesPay"
                     ? const Icon(Icons.check_circle, color: Color(0xFFFF5E62))
                     : null,
                 onTap: () {
                   setState(() {
-                    selectedPayment = "LesPay (Saldo Digital)";
+                    selectedPayment = "LesPay";
                     paymentIcon = Icons.account_balance_wallet;
-                    paymentColor = Colors.blue;
                   });
                   Navigator.pop(context);
                 },
               ),
-              const SizedBox(height: 20),
             ],
           ),
         );
@@ -134,7 +129,7 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
                     Icon(Icons.location_on, color: Colors.red),
                     SizedBox(width: 12),
                     Expanded(
-                        child: Text("Lokasi Kamu: Jl. Merdeka No.45, Jakarta",
+                        child: Text("Lokasi: Jl. Merdeka No.45",
                             style: TextStyle(color: Colors.grey)))
                   ]),
                 ],
@@ -142,7 +137,6 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
             ),
 
             const SizedBox(height: 32),
-
             const Text("Rincian Biaya",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
@@ -154,41 +148,47 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
             const Divider(height: 32, thickness: 1),
             _buildPriceRow("Total Pembayaran", "Rp $totalPrice", isTotal: true),
 
-            const SizedBox(height: 32),
+            const Spacer(),
 
-            // --- METODE PEMBAYARAN BARU ---
-            const Text("Metode Pembayaran",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            InkWell(
-              onTap: _showPaymentSelector,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                      color: const Color(0xFFFF5E62).withOpacity(0.5)),
-                  borderRadius: BorderRadius.circular(12),
-                  color: const Color(0xFFFF5E62).withOpacity(0.05),
-                ),
-                child: Row(
-                  children: [
-                    Icon(paymentIcon, color: paymentColor),
-                    const SizedBox(width: 12),
-                    Expanded(
-                        child: Text(selectedPayment,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16))),
-                    const Text("Ubah",
+            // --- WIDGET PILIH PEMBAYARAN BARU ---
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Icon(paymentIcon,
+                      color: selectedPayment == "LesPay"
+                          ? Colors.blue
+                          : Colors.green),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Metode Pembayaran",
+                            style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        Text(selectedPayment,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: _showPaymentSelector,
+                    child: const Text("Ubah",
                         style: TextStyle(
                             color: Color(0xFFFF5E62),
                             fontWeight: FontWeight.bold)),
-                  ],
-                ),
+                  )
+                ],
               ),
             ),
+            const SizedBox(height: 16),
 
-            const Spacer(),
-
+            // --- TOMBOL PESAN ---
             SizedBox(
               width: double.infinity,
               height: 56,
@@ -211,6 +211,7 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
